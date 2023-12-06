@@ -1,0 +1,10 @@
+# macOS directory custom attributes file
+**/.DS_Store
+
+# IDE-specific configurations
+.idea
+.vscode
+
+# Python Cache and Virtual Environment (venv)
+**/__pycache__
+venv
