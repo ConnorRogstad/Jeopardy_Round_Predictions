@@ -1,5 +1,4 @@
 from src.classifier.classifier_models import *
-from nltk.corpus import twitter_samples
 import json
 
 
@@ -10,8 +9,8 @@ __license__ = "MIT"
 __email__ = ["crogstad@westmont.edu"]
 
 
-class TweetFeature(Feature):
-    """TweetFeature child class of Feature used specifically for the twitter_samples corpus
+class JeopardyFeature(Feature):
+    """JeopardyFeature child class of Feature used specifically for the 200k_questions.json file
 
     Attributes:
         _name (str): human-readable name of the feature (e.g., "over 65 years old")
@@ -22,8 +21,8 @@ class TweetFeature(Feature):
         super().__init__(name, value)
 
 
-class TweetFeatureSet(FeatureSet):
-    """A set of tweet features that represent a single object.
+class JeopardyFeatureSet(FeatureSet):
+    """A set of jeopardy features that represent a single question's features.
 
     Attributes:
         _feat (set[Feature]): a set of features that define this object for the purposes of a classifier
@@ -45,45 +44,42 @@ class TweetFeatureSet(FeatureSet):
         constructor where `features` argument is the set of `Feature` instances created within the implementation of
         this method.
 
-        :param source_object: object to build the feature set from
-        :param known_clas: pre-defined classification of the source object
+        :param source_object: a single jeopardy question in json format
+        :param known_clas: pre-defined classification of the source object ("Jeopardy!","Double Jeopardy!",
+        "Final Jeopardy!" or "Tiebreaker")
         :param kwargs: any additional data needed to preprocess the `source_object` into a feature set
         :return: an instance of `FeatureSet` built based on the `source_object` passed in
         """
         # TODO: build build
 
-        rawSourceString = source_object
-        sourceString = source_object.lower()
-        sourceList = sourceString.split()
-        uniqueWords = set(sourceList)
-        sourceSet = set()
+        category = source_object["category"]  # String of the question's category
+        question_text = source_object["question"]  # String of the question's text
+        value = source_object["value"]  # String $ amount for the questions value
+        answer = source_object["answer"]  # String of the question's answer
 
-        # Length
-        sourceSet.add(Feature("Amount of characters", len(sourceString)))  # change to a range > 30 perhaps
+        source_set = set()
 
-        # Does not include an informative inclusive feature:
-        # sourceSet.add(Feature("Does not include \":(\"", ":(" not in sourceString))
-        # sourceSet.add(Feature("Does not include \"follow\"", "follow" not in sourceString))
-        # sourceSet.add(Feature("Does not include \"bam\"", "bam" not in sourceString))
-        # sourceSet.add(Feature("Does not include \"follow\"", "follow" not in sourceString))
+        # Feature for the Category of Question
+        source_set.add(Feature("Category of Question", category))
 
-        for word in uniqueWords:
-            # Unique words
-            sourceSet.add(Feature("Contains \"" + word + "\"", True))
-            # Amount of words
-            sourceSet.add(Feature("Amount of \"" + word + "\"", sourceList.count(word)))
+        # Feature for Length of Question (is it > or < 80)
+        if len(question_text > 80):
+            source_set.add(Feature("Amount of characters is >80", True))
+        else:
+            source_set.add(Feature("Amount of characters is <80", True))
 
-        return FeatureSet(sourceSet, known_clas)
+        # Feature for the value of the question
+        value_int = value[1:]  # get rid of $
+        value_int = int(value_int)
+        source_set.add(Feature("Value of Question", value_int))
+
+        return FeatureSet(source_set, known_clas)
 
 
-class TweetClassifier(AbstractClassifier):
+class JeopardyClassifier(AbstractClassifier):
     """Abstract definition for an object classifier."""
 
     def __init__(self, probability_dict: dict):
-        # Will have a set of all the features for the twitter_samples and how they predict which class (probability)
-        # SO,this constructor should have a dictionary of features and their probability for + or - tweet
-        # TODO: create TweetClassifier init
-
         self.probability_dict = probability_dict
 
     def get_probability_dict(self) -> dict:
