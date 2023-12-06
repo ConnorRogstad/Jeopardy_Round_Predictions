@@ -50,7 +50,6 @@ class JeopardyFeatureSet(FeatureSet):
         :param kwargs: any additional data needed to preprocess the `source_object` into a feature set
         :return: an instance of `FeatureSet` built based on the `source_object` passed in
         """
-        # TODO: build build
 
         category = source_object["category"]  # String of the question's category
         question_text = source_object["question"]  # String of the question's text
@@ -169,37 +168,49 @@ class JeopardyClassifier(AbstractClassifier):
             An Iterable([FeatureSet]) representation of the Training Set!!!
         :return: an instance of `AbstractClassifier` with its training already completed
         """
-        # TODO: create train
 
         all_features = {}
-        # all_features will store each feature that appears in any tweet with the feature name as its key (feature)
-        # and it will have the ratio of predicting positive to negative as its value
-        # Values will be a list [] with index 0 --> pos and index 1 --> neg
+        # all_features will be a dict with the feature as its key, and a list of 4 elements as its value
+        # the list will represent the predictability of their respective classes:
+        # (jeopardy, double_jeopardy, final_jeopardy, tiebreaker)
+        # Each num will be the number of that class the feature helped predict / 
+        # The total number of that class that the feature could have helped predict
 
-        positive_tally = 0
-        negative_tally = 0
+        jeopardy_round_tally = 0
+        double_jeopardy_round_tally = 0
+        final_jeopardy_round_tally = 0
+        tiebreaker_tally = 0
 
         for feature_set in training_set:
             for feature in feature_set.feat:
 
-                if all_features.get(feature, 0) == 0:  # if this feature is already recorded in the dict -> +1 to correct class
-                    all_features[feature] = [0, 0]  # adds this feature to the dict
+                if all_features.get(feature, 0) == 0:
+                    all_features[feature] = [0, 0, 0, 0]
 
-                if feature_set.clas == "positive":
-                    all_features[feature][0] += 1  # adds one to class positive
+                if feature_set.clas == "Jeopardy!":
+                    all_features[feature][0] += 1
+                elif feature_set.clas == "Double Jeopardy!":
+                    all_features[feature][1] += 1
+                elif feature_set.clas == "Final Jeopardy!":
+                    all_features[feature][2] += 1
                 else:
-                    all_features[feature][1] += 1  # adds one to class negative
+                    all_features[feature][3] += 1
 
-            # add one to pos or negative total depending on which class the feature_set was
-            if feature_set.clas == "positive":
-                positive_tally += 1
+            if feature_set.clas == "Jeopardy!":
+                jeopardy_round_tally += 1
+            elif feature_set.clas == "Double Jeopardy!":
+                double_jeopardy_round_tally += 1
+            elif feature_set.clas == "Final Jeopardy!":
+                final_jeopardy_round_tally += 1
             else:
-                negative_tally += 1
+                tiebreaker_tally += 1
 
-        # divide each # of positive or negative tweets with a specific feature by the total number of positive or
-        # negative tweets respectively
+        # divide each # of jeopardy, double_jeopardy, final_jeopardy, or tiebreaker questions with a specific feature by
+        # the total number of those class questions respectively
         for feature in all_features.keys():
-            all_features[feature][0] /= positive_tally
-            all_features[feature][1] /= negative_tally
+            all_features[feature][0] /= jeopardy_round_tally
+            all_features[feature][1] /= double_jeopardy_round_tally
+            all_features[feature][2] /= final_jeopardy_round_tally
+            all_features[feature][3] /= tiebreaker_tally
 
-        return TweetClassifier(all_features)
+        return JeopardyClassifier(all_features)
