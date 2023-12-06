@@ -3,8 +3,7 @@ This project makes use of Naive Bayes Text Classification techniques to determin
 
 ## Citations
 - Data:
-  The dataset used for this assignment was 'Jeopardy Dataset' from Kaggle and provided by Aravind Ram Nathan.
-  The data has a CC0: Public Domain License.
+  The dataset used for this assignment was 'Jeopardy Dataset' from Kaggle and provided by Aravind Ram Nathan. The data has a CC0: Public Domain License.
   - This data is stored in a json file with the following attribute:
       - 'category' : the question category, e.g. "HISTORY"
       - 'value' : $ value of the question as string, e.g. "$200"
