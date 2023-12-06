@@ -4,6 +4,13 @@
 This project makes use of Naive Bayes Text Classification techniques to determine which round a Jeopardy question might be from.
 
 ## Citations
+- Code:
+  The majority of code was written by myself (Connor Rogstad), with contributions coming from Mike Ryu and Davis Peterson.
+  - Contributions:
+      - jeopardy_classifier_models.py: Connor Rogstad
+      - helped write early structure of jeopardy_classifier_models.py: Davis Peterson
+      - classifier_models.py: Mike Ryu
+      
 - Data:
   The dataset used for this assignment was 'Jeopardy Dataset' from Kaggle and provided by Aravind Ram Nathan. The data has a CC0: Public Domain License.
   - This data is stored in a json file with the following attributes:
