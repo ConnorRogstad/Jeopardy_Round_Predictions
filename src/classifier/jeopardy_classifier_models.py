@@ -78,11 +78,15 @@ class JeopardyFeatureSet(FeatureSet):
 class JeopardyClassifier(AbstractClassifier):
     """Abstract definition for an object classifier."""
 
-    def __init__(self, probability_dict: dict):
+    def __init__(self, probability_dict: dict, proportions_list: list):
         self.probability_dict = probability_dict
+        self.proportions_list = proportions_list
 
     def get_probability_dict(self) -> dict:
         return self.probability_dict
+
+    def get_proportions_list(self) -> list:
+        return self.proportions_list
 
     def gamma(self, a_feature_set: FeatureSet) -> str:
         """Given a single feature set representing an object to be classified, returns the most probable class
@@ -91,25 +95,39 @@ class JeopardyClassifier(AbstractClassifier):
         :param a_feature_set: a single feature set representing an object to be classified
         :return: name of the class with the highest probability for the object
         """
-        # TODO: create gamma
-        gamma_pos = 1/2  # p hat of c
-        gamma_neg = 1/2  # p hat of c
+        
+        gamma_jeopardy = self.proportions_list[0]  # p hat of c
+        gamma_double_jeopardy = self.proportions_list[1]  # p hat of c
+        gamma_final_jeopardy = self.proportions_list[2]  # p hat of c
+        gamma_tiebreaker = self.proportions_list[3]  # p hat of c
+
         for feature in a_feature_set.feat:
             if self.probability_dict.get(feature, 0) != 0:  # if the feature is in the dictionary
-                gamma_pos *= self.probability_dict[feature][0]  # further compute gamma for positive
-                gamma_neg *= self.probability_dict[feature][1]  # further compute gamma for negative
+                gamma_jeopardy *= self.probability_dict[feature][0]  # further compute gamma for jeopardy
+                gamma_double_jeopardy *= self.probability_dict[feature][1]  # further compute gamma for double_jeopardy
+                gamma_final_jeopardy *= self.probability_dict[feature][2]  # further compute gamma for final_jeopardy
+                gamma_tiebreaker *= self.probability_dict[feature][3]  # further compute gamma for tiebreaker
 
-        if gamma_pos > gamma_neg:
-            return "positive, gamma = " + str(gamma_pos)
+        all_gammas = [gamma_jeopardy, gamma_double_jeopardy, gamma_final_jeopardy, gamma_tiebreaker]
+        if max(all_gammas) == all_gammas[0]:
+            return "Jeopardy!, gamma = " + str(all_gammas[0])
+        elif max(all_gammas) == all_gammas[1]:
+            return "Double Jeopardy!, gamma = " + str(all_gammas[1])
+        elif max(all_gammas) == all_gammas[2]:
+            return "Final Jeopardy!, gamma = " + str(all_gammas[2])
         else:
-            return "negative, gamma = " + str(gamma_neg)
+            return "Tiebreaker, gamma = " + str(all_gammas[3])
+
 
     def order_features(self, top_n: int = 1) -> str:
-        present_dict = dict(self.probability_dict)  # Copy the dictionary
+        present_dict = dict(self.probability_dict)
 
-        for feature in present_dict:  # For each feature
-            positive_value = present_dict[feature][0]
-            negative_value = present_dict[feature][1]
+        for feature in present_dict:
+            jeopardy_value = present_dict[feature][0]
+            double_jeopardy_value = present_dict[feature][1]
+            final_jeopardy_value = present_dict[feature][2]
+            tiebreaker_value = present_dict[feature][3]
+
             if positive_value > negative_value:  # If it's more positive than negative
                 if negative_value == 0:
                     present_dict[feature] = ["positive : negative", 1]
@@ -173,7 +191,7 @@ class JeopardyClassifier(AbstractClassifier):
         # all_features will be a dict with the feature as its key, and a list of 4 elements as its value
         # the list will represent the predictability of their respective classes:
         # (jeopardy, double_jeopardy, final_jeopardy, tiebreaker)
-        # Each num will be the number of that class the feature helped predict / 
+        # Each num will be the number of that class the feature helped predict /
         # The total number of that class that the feature could have helped predict
 
         jeopardy_round_tally = 0
@@ -213,4 +231,8 @@ class JeopardyClassifier(AbstractClassifier):
             all_features[feature][2] /= final_jeopardy_round_tally
             all_features[feature][3] /= tiebreaker_tally
 
-        return JeopardyClassifier(all_features)
+        total_tally = jeopardy_round_tally + double_jeopardy_round_tally + final_jeopardy_round_tally + tiebreaker_tally
+        prop_list = [jeopardy_round_tally / total_tally, double_jeopardy_round_tally / total_tally,
+                     final_jeopardy_round_tally / total_tally, tiebreaker_tally / total_tally]
+
+        return JeopardyClassifier(all_features, prop_list)
