@@ -62,15 +62,17 @@ class JeopardyFeatureSet(FeatureSet):
         source_set.add(Feature("Category of Question", category))
 
         # Feature for Length of Question (is it > or < 80)
-        if len(question_text > 80):
+        if len(question_text) > 80:
             source_set.add(Feature("Amount of characters is >80", True))
         else:
             source_set.add(Feature("Amount of characters is <80", True))
 
         # Feature for the value of the question
-        value_int = value[1:]  # get rid of $
-        value_int = int(value_int)
-        source_set.add(Feature("Value of Question", value_int))
+        if value is not None:
+            value_int = value[1:]  # get rid of $
+            value_int = value_int.replace(",", "")
+            value_int = int(value_int)
+            source_set.add(Feature("Value of Question", value_int))
 
         return FeatureSet(source_set, known_clas)
 
@@ -95,7 +97,7 @@ class JeopardyClassifier(AbstractClassifier):
         :param a_feature_set: a single feature set representing an object to be classified
         :return: name of the class with the highest probability for the object
         """
-        
+
         gamma_jeopardy = self.proportions_list[0]  # p hat of c
         gamma_double_jeopardy = self.proportions_list[1]  # p hat of c
         gamma_final_jeopardy = self.proportions_list[2]  # p hat of c
@@ -117,63 +119,6 @@ class JeopardyClassifier(AbstractClassifier):
             return "Final Jeopardy!, gamma = " + str(all_gammas[2])
         else:
             return "Tiebreaker, gamma = " + str(all_gammas[3])
-
-
-    def order_features(self, top_n: int = 1) -> str:
-        present_dict = dict(self.probability_dict)
-
-        for feature in present_dict:
-            jeopardy_value = present_dict[feature][0]
-            double_jeopardy_value = present_dict[feature][1]
-            final_jeopardy_value = present_dict[feature][2]
-            tiebreaker_value = present_dict[feature][3]
-
-            if positive_value > negative_value:  # If it's more positive than negative
-                if negative_value == 0:
-                    present_dict[feature] = ["positive : negative", 1]
-                else:
-                    present_dict[feature] = ["positive : negative", round(positive_value / negative_value, 2)]
-            elif positive_value < negative_value:  # If it's more negative than positive
-                if positive_value == 0:
-                    present_dict[feature] = ["negative : positive", 1]
-                else:
-                    present_dict[feature] = ["negative : positive", round(negative_value / positive_value, 2)]
-            else:  # Just in case...
-                present_dict[feature] = ["equal", 1]
-            # print(str(present_dict[feature]))
-
-        sortedList = sorted(present_dict.items(), key=lambda item: item[1][1], reverse=True)  # I get lambda now!
-        # print("SortedList: " + str(sortedList))
-        # sorted() will naturally output a list of this: (FeatureName,["direction", 0.0])
-        # the lambda should sort it by our "decimal" value
-
-        returnStr = "Most informative features:"
-        index = 0
-        while index < top_n:
-            space = " " * (3 - len(str(index + 1)))
-            featureNameStr = "\n" + str(index + 1) + "." + space + str(sortedList[index][0])
-            while len(featureNameStr) < 37:
-                featureNameStr += " "
-            returnStr += featureNameStr
-            returnStr += str(sortedList[index][1][0])
-            ratioStr = str(sortedList[index][1][1]) + " : 1"
-            while len(ratioStr) < 17:
-                ratioStr = " " + ratioStr
-            returnStr += ratioStr
-            index += 1
-
-        return returnStr
-
-    def present_features(self, top_n: int = 1) -> None:
-        """Prints `top_n` feature(s) used by this classifier in the descending order of informativeness of the
-        feature in determining a class for any object. Informativeness of a feature is a quantity that represents
-        how "good" a feature is in determining the class for an object.
-
-        :param top_n: how many of the top features to print; must be 1 or greater
-        """
-        # Dictionary format {FeatureName: [PosTally/testSetPos, NegTally/testSetNeg]
-        # TODO: create present_features
-        print(self.order_features(top_n))
 
     @classmethod
     def train(cls, training_set: Iterable[FeatureSet]) -> AbstractClassifier:

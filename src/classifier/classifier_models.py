@@ -103,16 +103,6 @@ class AbstractClassifier(ABC):
         """
         pass
 
-    @abstractmethod
-    def present_features(self, top_n: int = 1) -> None:
-        """Prints `top_n` feature(s) used by this classifier in the descending order of informativeness of the
-        feature in determining a class for any object. Informativeness of a feature is a quantity that represents
-        how "good" a feature is in determining the class for an object.
-
-        :param top_n: how many of the top features to print; must be 1 or greater
-        """
-        pass
-
     @classmethod
     @abstractmethod
     def train(cls, training_set: Iterable[FeatureSet]) -> AbstractClassifier:

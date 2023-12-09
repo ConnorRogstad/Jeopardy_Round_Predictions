@@ -8,3 +8,4 @@
 # Python Cache and Virtual Environment (venv)
 **/__pycache__
 venv
+data
