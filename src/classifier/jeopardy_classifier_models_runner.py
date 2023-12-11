@@ -18,7 +18,7 @@ __email__ = ["crogstad@westmont.edu"]
 
 def main() -> None:
 
-    file_path = '../data/200k_questions.json'
+    file_path = '../../data/200k_questions.json'
     with open(file_path, 'r') as file:
         data = json.load(file)
 
@@ -54,7 +54,7 @@ def main() -> None:
     our_jeopardy_classifier = JeopardyClassifier.train(train_jeopardy_feature_sets)  # create our classifier
 
     i = 0
-    while i < 1000:  # change this to however many we want to see
+    while i < 10:  # change this to however many we want to see
         print("Actual class: " + test_jeopardy_feature_sets[i].clas + " | Predicted class: "
               + our_jeopardy_classifier.gamma(test_jeopardy_feature_sets[i]))
         i += 1

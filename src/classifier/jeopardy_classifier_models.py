@@ -1,4 +1,4 @@
-from src.classifier.classifier_models import *
+from classifier_models import *
 import json
 
 
@@ -176,7 +176,7 @@ class JeopardyClassifier(AbstractClassifier):
             all_features[feature][2] /= final_jeopardy_round_tally
             all_features[feature][3] /= tiebreaker_tally
 
-        total_tally = jeopardy_round_tally + double_jeopardy_round_tally + final_jeopardy_round_tally + tiebreaker_tally
+        total_tally = len(training_set)
         prop_list = [jeopardy_round_tally / total_tally, double_jeopardy_round_tally / total_tally,
                      final_jeopardy_round_tally / total_tally, tiebreaker_tally / total_tally]
 
