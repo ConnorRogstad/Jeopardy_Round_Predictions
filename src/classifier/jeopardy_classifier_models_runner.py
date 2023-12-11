@@ -18,7 +18,7 @@ __email__ = ["crogstad@westmont.edu"]
 
 def main() -> None:
 
-    file_path = '/Users/conno/github-classroom/cs-with-mike/Jeopardy_Round_Predictions/data/200k_questions.json'
+    file_path = '/home/crogstad/200k_questions.json'
     with open(file_path, 'r') as file:
         data = json.load(file)
 
