@@ -1,7 +1,14 @@
 # Jeopardy_Round_Predictions
 
+#### Presentation Link: https://docs.google.com/presentation/d/1quLRHS2f-rv3u2Q0OUJZZU8ROOeTNnj-D_GVTZRFDto/edit?pli=1#slide=id.p
+#### Author: Connor Rogstad
+#### License: MIT License (see file in repo for more details)
+
 ## About
 This project makes use of Naive Bayes Text Classification techniques to determine which round a Jeopardy question might be from.
+
+## Utilizing my Software
+- 
 
 ## Citations
 - Code:
