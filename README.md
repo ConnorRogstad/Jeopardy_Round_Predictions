@@ -9,7 +9,7 @@ This project makes use of Naive Bayes Text Classification techniques to determin
 
 ## Utilizing my Software
 - There are a couple of ways to utilize my software:
-  - One can use my classifier_models.py as a base abstract class setup to try to attempt a Naive Bayes Text Classification on a different dataset and for different classes.
+  - One could use my classifier_models.py as a base abstract class setup to try to attempt a Naive Bayes Text Classification on a different dataset and for different classes.
   - One could try modifying the build function in the JeopardyFeatureSet class in my jeopardy_classifier_models.py and use different features to try and predict the jeopardy question rounds at a better accuracy.
   - One could write a present_features function in the JeopardyClassifier class that would print the most predictive features for questions to gain better insight on which features help the model. 
 
